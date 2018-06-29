@@ -32,12 +32,23 @@ LOCAL_C_INCLUDES += \
 MESA_VERSION := $(shell cat $(MESA_TOP)/VERSION)
 # define ANDROID_VERSION (e.g., 4.0.x => 0x0400)
 LOCAL_CFLAGS += \
+	-Wno-unused-private-field \
+	-Wno-unused-function \
+	-Wno-unused-variable \
 	-Wno-unused-parameter \
 	-Wno-date-time \
 	-Wno-pointer-arith \
 	-Wno-missing-field-initializers \
 	-Wno-initializer-overrides \
 	-Wno-mismatched-tags \
+	-Wno-sometimes-uninitialized \
+	-Wno-missing-braces \
+	-Wno-enum-conversion\
+	-Wno-delete-non-virtual-dtor \
+	-Wno-overloaded-virtual \
+	-Wno-absolute-value \
+	-Wno-implicit-function-declaration \
+	-Wno-typedef-redefinition \
 	-DPACKAGE_VERSION=\"$(MESA_VERSION)\" \
 	-DPACKAGE_BUGREPORT=\"https://bugs.freedesktop.org/enter_bug.cgi?product=Mesa\" \
 	-DANDROID_VERSION=0x0$(MESA_ANDROID_MAJOR_VERSION)0$(MESA_ANDROID_MINOR_VERSION)
@@ -114,11 +125,13 @@ LOCAL_CPPFLAGS += \
 	-Wno-non-virtual-dtor
 
 ifeq ($(MESA_LOLLIPOP_BUILD),true)
-  LOCAL_CFLAGS_32 += -DDEFAULT_DRIVER_DIR=\"/system/lib/$(MESA_DRI_MODULE_REL_PATH)\"
-  LOCAL_CFLAGS_64 += -DDEFAULT_DRIVER_DIR=\"/system/lib64/$(MESA_DRI_MODULE_REL_PATH)\"
+  LOCAL_CFLAGS_32 += -DDEFAULT_DRIVER_DIR=\"/vendor/lib/$(MESA_DRI_MODULE_REL_PATH)\"
+  LOCAL_CFLAGS_64 += -DDEFAULT_DRIVER_DIR=\"/vendor/lib64/$(MESA_DRI_MODULE_REL_PATH)\"
 else
   LOCAL_CFLAGS += -DDEFAULT_DRIVER_DIR=\"/system/lib/$(MESA_DRI_MODULE_REL_PATH)\"
 endif
+
+LOCAL_PROPRIETARY_MODULE := true
 
 # uncomment to keep the debug symbols
 #LOCAL_STRIP_MODULE := false
