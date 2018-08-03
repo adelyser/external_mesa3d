@@ -505,12 +505,10 @@ get_front_bo(struct dri2_egl_surface *dri2_surf, unsigned int format)
 }
 
 static int
-get_back_bo(struct dri2_egl_surface *dri2_surf)
+get_back_bo(struct dri2_egl_surface *dri2_surf, unsigned int format)
 {
    struct dri2_egl_display *dri2_dpy =
       dri2_egl_display(dri2_surf->base.Resource.Display);
-   int fourcc, pitch;
-   int offset = 0, fd;
 
    if (dri2_surf->dri_image_back)
       return 0;
@@ -521,32 +519,12 @@ get_back_bo(struct dri2_egl_surface *dri2_surf)
          return -1;
       }
 
-      fd = get_native_buffer_fd(dri2_surf->buffer);
-      if (fd < 0) {
-         _eglLog(_EGL_WARNING, "Could not get native buffer FD");
-         return -1;
-      }
-
-      fourcc = get_fourcc(dri2_surf->buffer->format);
-
-      pitch = dri2_surf->buffer->stride *
-         get_format_bpp(dri2_surf->buffer->format);
-
-      if (fourcc == -1 || pitch == 0) {
-         _eglLog(_EGL_WARNING, "Invalid buffer fourcc(%x) or pitch(%d)",
-                 fourcc, pitch);
-         return -1;
-      }
-
       dri2_surf->dri_image_back =
-         dri2_dpy->image->createImageFromFds(dri2_dpy->dri_screen,
+         dri2_dpy->image->createImage(dri2_dpy->dri_screen,
                                              dri2_surf->base.Width,
                                              dri2_surf->base.Height,
-                                             fourcc,
-                                             &fd,
-                                             1,
-                                             &pitch,
-                                             &offset,
+                                             format,
+                                             0,
                                              dri2_surf);
       if (!dri2_surf->dri_image_back) {
          _eglLog(_EGL_WARNING, "failed to create DRI image from FD");
@@ -605,7 +583,7 @@ droid_image_get_buffers(__DRIdrawable *driDrawable,
    }
 
    if (buffer_mask & __DRI_IMAGE_BUFFER_BACK) {
-      if (get_back_bo(dri2_surf) < 0)
+      if (get_back_bo(dri2_surf, format) < 0)
          return 0;
 
       if (dri2_surf->dri_image_back) {
