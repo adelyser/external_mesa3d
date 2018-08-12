@@ -25,7 +25,11 @@ LOCAL_MODULE := libmesa_broadcom_cle
 
 LOCAL_MODULE_CLASS := STATIC_LIBRARIES
 
-LOCAL_SRC_FILES := $(BROADCOM_DECODER_FILES)
+LOCAL_SRC_FILES := $(BROADCOM_DECODER_FILES) \
+        clif/clif_dump.c
+
+LOCAL_C_INCLUDES := \
+        $(MESA_TOP)/src/gallium/include
 
 LOCAL_STATIC_LIBRARIES := libmesa_broadcom_genxml
 
